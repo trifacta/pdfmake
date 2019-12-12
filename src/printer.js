@@ -110,7 +110,7 @@ function PdfPrinter(fontDescriptors) {
  *
  * @return {Object} a pdfKit document object which can be saved or encode to data-url
  */
-PdfPrinter.prototype.createPdfKitDocument = function (docDefinition, options) {
+PdfPrinter.prototype.createPdfKitDocument = async function (docDefinition, options) {
 	options = options || {};
 
 	docDefinition.version = docDefinition.version || '1.3';
@@ -161,7 +161,7 @@ PdfPrinter.prototype.createPdfKitDocument = function (docDefinition, options) {
 		this.pdfKitDoc.options.size = [pageSize.width, pageHeight];
 	}
 
-	renderPages(pages, this.fontProvider, this.pdfKitDoc, options.progressCallback);
+	await renderPages(pages, this.fontProvider, this.pdfKitDoc, options.progressCallback);
 
 	if (options.autoPrint) {
 		var printActionRef = this.pdfKitDoc.ref({
@@ -359,7 +359,7 @@ function updatePageOrientationInOptions(currentPage, pdfKitDoc) {
 	}
 }
 
-function renderPages(pages, fontProvider, pdfKitDoc, progressCallback) {
+async function renderPages(pages, fontProvider, pdfKitDoc, progressCallback) {
 	pdfKitDoc._pdfMakePages = pages;
 	pdfKitDoc.addPage();
 
@@ -409,6 +409,8 @@ function renderPages(pages, fontProvider, pdfKitDoc, progressCallback) {
 		if (page.watermark) {
 			renderWatermark(page, pdfKitDoc);
 		}
+
+		await setImmediatePromise();
 	}
 }
 
